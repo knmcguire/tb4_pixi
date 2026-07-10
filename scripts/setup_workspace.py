@@ -26,6 +26,7 @@ REPOS = {
     "turtlebot4_simulator": "https://github.com/turtlebot/turtlebot4_simulator",
     # its source-only dependencies (rosdep debs in the container)
     "turtlebot4": "https://github.com/turtlebot/turtlebot4",
+    "turtlebot4_desktop": "https://github.com/turtlebot/turtlebot4_desktop",
     "create3_sim": "https://github.com/iRobotEducation/create3_sim",
     "irobot_create_msgs": "https://github.com/iRobotEducation/irobot_create_msgs",
 }
