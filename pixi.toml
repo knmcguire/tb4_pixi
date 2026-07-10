@@ -1,0 +1,127 @@
+# ROSCon 2025 Intro to ROS Workshop — pixi edition
+#
+# Cross-platform (Linux / macOS / Windows) replacement for
+# https://github.com/kscottz/turtlebot4_docker
+#
+# What the Dockerfile does            ->  What this manifest does
+# ---------------------------------------------------------------
+# FROM ros:jazzy + ros-jazzy-desktop  ->  robostack-jazzy: ros-jazzy-desktop
+# apt install gz-harmonic             ->  gz-sim8 & friends pulled in via ros-jazzy-ros-gz
+# ros-jazzy-ros-gz                    ->  ros-jazzy-ros-gz
+# ros-jazzy-teleop-twist-keyboard     ->  ros-jazzy-teleop-twist-keyboard
+# git clone turtlebot4_simulator      ->  `pixi run setup`   (clones sources into ./src)
+# rosdep install                      ->  binary deps listed below + sources for the rest
+# colcon build --symlink-install     ->  `pixi run build`
+# source overlay in entrypoint        ->  activation scripts source install/setup.*
+# rocker --x11 ... tb4 bash           ->  `pixi shell`  (no X11 forwarding needed!)
+# --volume ... /src/workshop          ->  your code just lives in ./src/workshop natively
+
+[workspace]
+name = "roscon2025-intro-workshop"
+version = "1.0.0"
+description = "ROS 2 Jazzy + Gazebo Harmonic + TurtleBot 4 simulation, no Docker required"
+authors = ["ROSCon 2025 Workshop"]
+channels = ["https://prefix.dev/robostack-jazzy", "conda-forge"]
+platforms = ["linux-64", "linux-aarch64", "osx-arm64", "osx-64", "win-64"]
+
+[dependencies]
+# --- ROS 2 Jazzy desktop (rviz2, demos, rqt, ...) — same as ros-jazzy-desktop in the container
+ros-jazzy-desktop = "*"
+# --- ROS <-> Gazebo bridge; pulls in Gazebo Harmonic (gz-sim8) from conda-forge
+ros-jazzy-ros-gz = "*"
+# --- drive the robot from the keyboard
+ros-jazzy-teleop-twist-keyboard = "*"
+
+# --- binary deps of turtlebot4_simulator / create3_sim / turtlebot4
+#     (these are what rosdep pulls from apt inside the container)
+ros-jazzy-nav2-bringup = "*"
+ros-jazzy-navigation2 = "*"
+ros-jazzy-slam-toolbox = "*"
+ros-jazzy-robot-localization = "*"
+ros-jazzy-xacro = "*"
+ros-jazzy-joint-state-publisher = "*"
+ros-jazzy-joint-state-publisher-gui = "*"
+
+# --- build toolchain (the container gets these from the ros:jazzy base image)
+colcon-common-extensions = "*"
+rosdep = "*"
+vcstool = "*"
+compilers = "*"
+cmake = "*"
+ninja = "*"
+pkg-config = "*"
+make = "*"
+git = "*"
+python = "*"
+setuptools = "*"
+
+# On Windows you must have Visual Studio 2022 (or Build Tools) with the
+# "Desktop development with C++" workload installed. This package just wires
+# the MSVC environment into the pixi shell.
+[target.win-64.dependencies]
+vs2022_win-64 = "*"
+
+# ---------------------------------------------------------------------------
+# Environment variables (replaces ENV lines in the Dockerfile)
+# ---------------------------------------------------------------------------
+[activation.env]
+GZ_VERSION = "harmonic"
+
+# Source the colcon overlay on shell entry — this replaces the Dockerfile's
+# sed hack that appends `source $OVERLAY_WS/install/setup.bash` to the
+# /ros_entrypoint.sh. The scripts are no-ops until you've run `pixi run build`.
+[target.unix.activation]
+scripts = ["scripts/activate.sh"]
+
+[target.win-64.activation]
+scripts = ["scripts/activate.bat"]
+
+# ---------------------------------------------------------------------------
+# Tasks — the workshop workflow
+# ---------------------------------------------------------------------------
+[tasks]
+# 1. Fetch the simulator sources (idempotent). Equivalent to the Dockerfile's
+#    `git clone https://github.com/turtlebot/turtlebot4_simulator -b jazzy`
+#    plus the repos rosdep would otherwise install as debs but which RoboStack
+#    doesn't package (turtlebot4, create3_sim, irobot_create_msgs).
+setup = { cmd = "python scripts/setup_workspace.py", description = "Clone TurtleBot 4 simulator sources into ./src" }
+
+# 2. Check for any system deps we haven't covered (optional, informational)
+deps-check = { cmd = "rosdep check --from-paths src --ignore-src", description = "Report any missing dependencies" }
+
+# 3. Build the overlay workspace. Equivalent to the Dockerfile's
+#    `colcon build --symlink-install`. We use --merge-install so the overlay
+#    layout (and activation script) is identical on all three OSes, and it
+#    keeps paths short enough for Windows.
+build = { cmd = "colcon build --merge-install --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release", depends-on = ["setup"], description = "colcon build the workspace" }
+
+[target.win-64.tasks]
+# --symlink-install needs Developer Mode on Windows, so leave it off there.
+# -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON: the TurtleBot4/Create3 packages are
+# developed on Linux and lack __declspec(dllexport) visibility macros, so MSVC
+# would otherwise produce DLLs with no import .lib, breaking downstream
+# find_package() calls (missing irobot_create_toolbox.lib etc.). This flag
+# makes MSVC export all symbols, matching GCC's default behavior.
+# -DCMAKE_CXX_FLAGS: MSVC hides M_PI/M_E behind _USE_MATH_DEFINES, and
+# windows.h defines min/max macros that clash with std::min/max (NOMINMAX).
+# Since setting CMAKE_CXX_FLAGS replaces CMake's MSVC defaults, we restate
+# them (/DWIN32 /D_WINDOWS /W3 /GR /EHsc) and append our defines.
+build = { cmd = "colcon build --merge-install --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS:BOOL=ON -DBUILD_TESTING=OFF \"-DCMAKE_CXX_FLAGS=/DWIN32 /D_WINDOWS /W3 /GR /EHsc /D_USE_MATH_DEFINES /DNOMINMAX\"", depends-on = ["setup"], description = "colcon build the workspace (Windows)" }
+
+[tasks.sim]
+# The workshop's headline command:
+#   ros2 launch turtlebot4_gz_bringup turtlebot4_gz.launch.py world:=maze
+cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_gz.launch.py world:=maze"
+description = "Launch the TurtleBot 4 maze simulation"
+
+[tasks.teleop]
+cmd = "ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=cmd_vel_unstamped"
+description = "Drive the robot with the keyboard"
+
+[tasks.drive-circle]
+cmd = "ros2 topic pub /cmd_vel_unstamped geometry_msgs/msg/Twist \"{linear: {x: 2.0, y: 2.0, z: 2.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}\" -r 5"
+description = "Publish a constant velocity command"
+
+[tasks.clean]
+cmd = "python scripts/clean_workspace.py"
+description = "Remove build/, install/ and log/"
