@@ -1,5 +1,7 @@
 # ROSCon 2025 Intro to ROS Workshop — pixi edition
 
+-- EXPERIMENTAL!!! still ongoing bugs that need to be fixed --
+
 A cross-platform (Linux, macOS, Windows) replacement for the
 [turtlebot4_docker](https://github.com/kscottz/turtlebot4_docker) container.
 Instead of Docker + rocker + X11 forwarding, everything — ROS 2 Jazzy, Gazebo
