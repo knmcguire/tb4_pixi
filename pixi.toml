@@ -42,6 +42,13 @@ ros-jazzy-xacro = "*"
 ros-jazzy-joint-state-publisher = "*"
 ros-jazzy-joint-state-publisher-gui = "*"
 
+# --- ros2_control stack: irobot_create_control drives the wheels through a
+#     diff-drive controller loaded by the gz_ros2_control Gazebo plugin
+ros-jazzy-ros2-control = "*"        # controller_manager & friends
+ros-jazzy-ros2-controllers = "*"    # diff_drive_controller, joint_state_broadcaster
+ros-jazzy-gz-ros2-control = "*"     # bridges ros2_control into Gazebo Harmonic
+ros-jazzy-rsl = "*"                 # exec dep of irobot_create_control
+
 # --- build toolchain (the container gets these from the ros:jazzy base image)
 colcon-common-extensions = "*"
 rosdep = "*"
