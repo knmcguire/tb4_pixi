@@ -49,6 +49,29 @@ ros-jazzy-ros2-controllers = "*"    # diff_drive_controller, joint_state_broadca
 ros-jazzy-gz-ros2-control = "*"     # bridges ros2_control into Gazebo Harmonic
 ros-jazzy-rsl = "*"                 # exec dep of irobot_create_control
 
+# --- TurtleBot 4 + iRobot Create 3 simulator stack
+#     (previously cloned and built from source; now available as conda packages)
+ros-jazzy-turtlebot4-simulator = "*"          # metapackage
+ros-jazzy-turtlebot4-gz-bringup = "*"
+ros-jazzy-turtlebot4-gz-gui-plugins = "*"
+ros-jazzy-turtlebot4-gz-toolbox = "*"
+ros-jazzy-turtlebot4-description = "*"
+ros-jazzy-turtlebot4-msgs = "*"
+ros-jazzy-turtlebot4-navigation = "*"
+ros-jazzy-turtlebot4-node = "*"
+ros-jazzy-turtlebot4-desktop = "*"
+ros-jazzy-turtlebot4-viz = "*"
+ros-jazzy-irobot-create-msgs = "*"
+ros-jazzy-irobot-create-common-bringup = "*"
+ros-jazzy-irobot-create-control = "*"
+ros-jazzy-irobot-create-description = "*"
+ros-jazzy-irobot-create-nodes = "*"
+ros-jazzy-irobot-create-toolbox = "*"
+ros-jazzy-irobot-create-gz-bringup = "*"
+ros-jazzy-irobot-create-gz-plugins = "*"
+ros-jazzy-irobot-create-gz-sim = "*"
+ros-jazzy-irobot-create-gz-toolbox = "*"
+
 # --- build toolchain (the container gets these from the ros:jazzy base image)
 colcon-common-extensions = "*"
 rosdep = "*"
