@@ -17,3 +17,5 @@ unset _OVERLAY_SETUP
 # uncomment the two lines below to force CPU (software) rendering:
 # export LIBGL_ALWAYS_SOFTWARE=1
 # export MESA_GL_VERSION_OVERRIDE=3.3
+
+export GZ_SIM_SYSTEM_PLUGIN_PATH="${CONDA_PREFIX}/lib${GZ_SIM_SYSTEM_PLUGIN_PATH:+:${GZ_SIM_SYSTEM_PLUGIN_PATH}}"
