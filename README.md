@@ -29,6 +29,19 @@ pixi run build     # fetches sources into ./src and colcon-builds them
 pixi run sim       # launches the TurtleBot 4 maze world in Gazebo
 ```
 
+On Windows, you can run Gazebo server, robot stack, and GUI in separate terminals:
+
+```powershell
+# Terminal 1
+pixi run sim-server
+
+# Terminal 2
+pixi run sim-robot
+
+# Terminal 3
+pixi run sim-gui
+```
+
 The first `pixi run build` downloads the whole ROS 2 Jazzy desktop + Gazebo
 Harmonic stack (a few GB) and compiles the TurtleBot 4 / Create 3 packages
 from source, so give it a while — comparable to the `docker build` path in the
@@ -109,6 +122,32 @@ If a build complains about a missing dependency, run
   combination for Gazebo. Keep the project in a short path (e.g. `C:\ws`) to
   avoid Windows path-length limits during the colcon build. If native Windows
   gives you trouble, WSL2 + the Linux instructions is a reliable fallback.
+
+### Windows process cleanup
+
+On some Windows setups, `Ctrl+C` does not fully tear down all child processes
+spawned by `ros2 launch` / Gazebo, leaving background `gz`/ROS processes alive.
+If that happens, run:
+
+```powershell
+pixi run stop-sim
+```
+
+This kills known TurtleBot 4 simulator process trees started by this workspace.
+
+### Windows split launch (optional)
+
+If you prefer explicit server / robot / GUI terminals on Windows, use:
+
+```powershell
+pixi run sim-server
+pixi run sim-robot
+pixi run sim-gui
+```
+
+`sim-server` starts headless Gazebo (`-s`) only.
+`sim-robot` starts robot spawn, bridges, and ROS nodes.
+`sim-gui` attaches the Gazebo GUI to the running server.
 
 ## Layout
 

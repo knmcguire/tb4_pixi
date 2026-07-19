@@ -126,17 +126,10 @@ deps-check = { cmd = "rosdep check --from-paths src --ignore-src", description =
 build = { cmd = "colcon build --merge-install --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release", depends-on = ["setup"], description = "colcon build the workspace" }
 
 [target.win-64.tasks]
-# --symlink-install needs Developer Mode on Windows, so leave it off there.
-# -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON: the TurtleBot4/Create3 packages are
-# developed on Linux and lack __declspec(dllexport) visibility macros, so MSVC
-# would otherwise produce DLLs with no import .lib, breaking downstream
-# find_package() calls (missing irobot_create_toolbox.lib etc.). This flag
-# makes MSVC export all symbols, matching GCC's default behavior.
-# -DCMAKE_CXX_FLAGS: MSVC hides M_PI/M_E behind _USE_MATH_DEFINES, and
-# windows.h defines min/max macros that clash with std::min/max (NOMINMAX).
-# Since setting CMAKE_CXX_FLAGS replaces CMake's MSVC defaults, we restate
-# them (/DWIN32 /D_WINDOWS /W3 /GR /EHsc) and append our defines.
-build = { cmd = "colcon build --merge-install --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS:BOOL=ON -DBUILD_TESTING=OFF \"-DCMAKE_CXX_FLAGS=/DWIN32 /D_WINDOWS /W3 /GR /EHsc /D_USE_MATH_DEFINES /DNOMINMAX\"", depends-on = ["setup"], description = "colcon build the workspace (Windows)" }
+sim-server = { cmd = "gz sim .pixi/envs/default/Library/share/turtlebot4_gz_bringup/worlds/maze.sdf -s -r -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", description = "Launch Gazebo server only (Windows)" }
+sim-robot = { cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_spawn.launch.py world:=maze model:=standard", description = "Spawn TurtleBot 4 and ROS bridge/node stack (Windows)" }
+sim-gui = { cmd = "gz sim -g -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", description = "Launch Gazebo GUI and connect to running server (Windows)" }
+stop-sim = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/stop_ros_windows.ps1", description = "Stop lingering ROS/Gazebo process trees (Windows)" }
 
 [tasks.sim]
 # The workshop's headline command:
