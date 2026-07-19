@@ -15,4 +15,5 @@ set "GZ_SIM_RESOURCE_PATH=%CONDA_PREFIX%\Library\share\turtlebot4_gz_bringup\wor
 rem Gazebo GUI plugin lookup paths (TurtleBot4/Create3 UI plugins).
 set "GZ_GUI_PLUGIN_PATH=%CONDA_PREFIX%\Library\share\turtlebot4_gz_gui_plugins\lib;%CONDA_PREFIX%\Library\share\irobot_create_gz_plugins\lib;%GZ_GUI_PLUGIN_PATH%"
 
-set "GZ_SIM_SYSTEM_PLUGIN_PATH=%CONDA_PREFIX%\Library\lib;%GZ_SIM_SYSTEM_PLUGIN_PATH%"
+rem Gazebo system plugins on Windows can be in both bin and lib (e.g. gz_ros2_control-system.dll).
+set "GZ_SIM_SYSTEM_PLUGIN_PATH=%CONDA_PREFIX%\Library\bin;%CONDA_PREFIX%\Library\lib;%GZ_SIM_SYSTEM_PLUGIN_PATH%"
