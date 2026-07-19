@@ -135,19 +135,6 @@ pixi run stop-sim
 
 This kills known TurtleBot 4 simulator process trees started by this workspace.
 
-### Windows split launch (optional)
-
-If you prefer explicit server / robot / GUI terminals on Windows, use:
-
-```powershell
-pixi run sim-server
-pixi run sim-robot
-pixi run sim-gui
-```
-
-`sim-server` starts headless Gazebo (`-s`) only.
-`sim-robot` starts robot spawn, bridges, and ROS nodes.
-`sim-gui` attaches the Gazebo GUI to the running server.
 
 ## Layout
 
