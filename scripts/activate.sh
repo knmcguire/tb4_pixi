@@ -18,4 +18,11 @@ unset _OVERLAY_SETUP
 # export LIBGL_ALWAYS_SOFTWARE=1
 # export MESA_GL_VERSION_OVERRIDE=3.3
 
+# Gazebo resource lookup paths (worlds/models/assets).
+export GZ_SIM_RESOURCE_PATH="${CONDA_PREFIX}/share/turtlebot4_gz_bringup/worlds:${CONDA_PREFIX}/share/irobot_create_gz_bringup/worlds:${CONDA_PREFIX}/share${GZ_SIM_RESOURCE_PATH:+:${GZ_SIM_RESOURCE_PATH}}"
+
+# Gazebo GUI plugin lookup paths (TurtleBot4/Create3 UI plugins).
+export GZ_GUI_PLUGIN_PATH="${CONDA_PREFIX}/share/turtlebot4_gz_gui_plugins/lib:${CONDA_PREFIX}/share/irobot_create_gz_plugins/lib${GZ_GUI_PLUGIN_PATH:+:${GZ_GUI_PLUGIN_PATH}}"
+
+# Gazebo system plugin lookup paths.
 export GZ_SIM_SYSTEM_PLUGIN_PATH="${CONDA_PREFIX}/lib${GZ_SIM_SYSTEM_PLUGIN_PATH:+:${GZ_SIM_SYSTEM_PLUGIN_PATH}}"
