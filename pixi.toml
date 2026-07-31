@@ -173,7 +173,15 @@ clock-bridge = { cmd = "ros2 run ros_gz_bridge parameter_bridge /clock@rosgraph_
 # Backs up the original once. A `pixi install`/re-solve restores the conda DLL,
 # so re-run this (or `build` -> `overlay-controller-manager`) after that.
 overlay-controller-manager = { cmd = "powershell -ExecutionPolicy Bypass -Command \"$dst='.pixi/envs/default/Library/bin/controller_manager.dll'; if (!(Test-Path ($dst + '.conda-backup'))) { Copy-Item $dst ($dst + '.conda-backup') }; Copy-Item -Force install/bin/controller_manager.dll $dst; Write-Host '[overlay] patched controller_manager.dll copied over conda copy'\"", description = "Copy patched controller_manager.dll over the conda copy (Windows load-order fix)" }
-sim-server = { cmd = "gz sim .pixi/envs/default/Library/share/turtlebot4_gz_bringup/worlds/maze.sdf -s -r -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", description = "Launch Gazebo server only (Windows)" }
+# Stamp the patched controller_manager.dll over the conda copy right before the
+# sim starts. This is the no-backup companion to overlay-controller-manager:
+# gz_ros2_control resolves controller_manager.dll from the conda Library\bin
+# (which beats the install\ overlay on PATH), so the patched DLL must physically
+# replace the conda one. Runs on every sim-server start so a re-solve can't
+# leave the unpatched DLL in place. Only copies if the build produced the DLL,
+# and ignores a locked-file failure (e.g. a sim already running).
+overlay-cm-nobackup = { cmd = "powershell -ExecutionPolicy Bypass -Command \"$src='install/bin/controller_manager.dll'; $dst='.pixi/envs/default/Library/bin/controller_manager.dll'; if (Test-Path $src) { try { Copy-Item -Force $src $dst; Write-Host '[overlay] patched controller_manager.dll in place' } catch { Write-Host '[overlay] skip: controller_manager.dll is locked (sim running?)' } } else { Write-Host '[overlay] skip: install/bin/controller_manager.dll not built yet' }\"", description = "Stamp patched controller_manager.dll over conda copy, no backup (Windows)" }
+sim-server = { cmd = "gz sim .pixi/envs/default/Library/share/turtlebot4_gz_bringup/worlds/maze.sdf -s -r -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", depends-on = ["overlay-cm-nobackup"], description = "Launch Gazebo server only (Windows; overlays patched controller_manager.dll first)" }
 sim-robot = { cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_spawn.launch.py world:=maze model:=standard", description = "Spawn TurtleBot 4 and ROS bridge/node stack (Windows)" }
 sim-gui = { cmd = "gz sim -g -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", description = "Launch Gazebo GUI and connect to running server (Windows)" }
 stop-sim = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/stop_ros_windows.ps1", description = "Stop lingering ROS/Gazebo process trees (Windows)" }

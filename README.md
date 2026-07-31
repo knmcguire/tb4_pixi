@@ -21,15 +21,30 @@ your files (no `chown -R` after the workshop).
    Build Tools, with the *Desktop development with C++* workload. It's needed
    to compile the TurtleBot 4 packages.
 
-## Quick start
+## Installation
+
+### Ubuntu
 
 ```bash
 git clone <this repo>
 cd <this repo>
 
-pixi run build     # fetches sources into ./src and colcon-builds them
-pixi run sim       # launches the TurtleBot 4 maze world in Gazebo
+pixi install      
+pixi run sim       
 ```
+
+### Windows
+
+
+```cmd
+git clone <this repo>
+cd <this repo>
+
+pixi run setup
+pixi run build-fix
+      
+```
+
 
 On Windows, you can run Gazebo server, robot stack, and GUI in separate terminals:
 
@@ -42,12 +57,11 @@ pixi run sim-robot
 
 # Terminal 3
 pixi run sim-gui
+
+# Terminal 4
+pixi run sim-robot
 ```
 
-The first `pixi run build` downloads the whole ROS 2 Jazzy desktop + Gazebo
-Harmonic stack (a few GB) and compiles the TurtleBot 4 / Create 3 packages
-from source, so give it a while — comparable to the `docker build` path in the
-original workshop.
 
 ## Workshop workflow (Docker → pixi cheat sheet)
 
