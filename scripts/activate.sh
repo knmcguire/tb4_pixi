@@ -26,3 +26,16 @@ export GZ_GUI_PLUGIN_PATH="${CONDA_PREFIX}/share/turtlebot4_gz_gui_plugins/lib:$
 
 # Gazebo system plugin lookup paths.
 export GZ_SIM_SYSTEM_PLUGIN_PATH="${CONDA_PREFIX}/lib${GZ_SIM_SYSTEM_PLUGIN_PATH:+:${GZ_SIM_SYSTEM_PLUGIN_PATH}}"
+
+# On WSL, there are some more environment variables to handle the GPU properly
+if [ -n "${WSL_DISTRO_NAME}" ]; then
+  export LD_LIBRARY_PATH=/usr/lib/wsl/lib:$LD_LIBRARY_PATH
+  export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA
+  export GALLIUM_DRIVER=d3d12
+
+  export QT_QPA_PLATFORM=xcb
+  export GZ_RENDER_ENGINE=ogre2
+
+  export LIBGL_ALWAYS_INDIRECT=0
+  export LIBGL_ALWAYS_SOFTWARE=0
+fi
