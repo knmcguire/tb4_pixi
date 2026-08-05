@@ -21,15 +21,30 @@ your files (no `chown -R` after the workshop).
    Build Tools, with the *Desktop development with C++* workload. It's needed
    to compile the TurtleBot 4 packages.
 
-## Quick start
+## Installation
+
+### Ubuntu
 
 ```bash
 git clone <this repo>
 cd <this repo>
 
-pixi run build     # fetches sources into ./src and colcon-builds them
-pixi run sim       # launches the TurtleBot 4 maze world in Gazebo
+pixi install      
+pixi run sim       
 ```
+
+### Windows
+
+
+```cmd
+git clone <this repo>
+cd <this repo>
+
+pixi run setup
+pixi run build-fix
+      
+```
+
 
 On Windows, you can run Gazebo server, robot stack, and GUI in separate terminals:
 
@@ -42,22 +57,21 @@ pixi run sim-robot
 
 # Terminal 3
 pixi run sim-gui
+
+# Terminal 4 (/clock bridge)
+pixi run clock-bridge
 ```
 
-The first `pixi run build` downloads the whole ROS 2 Jazzy desktop + Gazebo
-Harmonic stack (a few GB) and compiles the TurtleBot 4 / Create 3 packages
-from source, so give it a while — comparable to the `docker build` path in the
-original workshop.
 
 ## Workshop workflow (Docker → pixi cheat sheet)
 
 | Docker workshop                                                        | pixi edition                    |
 | ---------------------------------------------------------------------- | ------------------------------- |
-| `docker pull ...` / `docker build . -t tb4`                            | `pixi run build`                |
+| `docker pull ...` / `docker build . -t tb4`                            | `pixi run build` (ros2_control source build) |
 | `rocker --x11 --devices=/dev/dri tb4 bash`                             | `pixi shell`                    |
 | `--volume .../workshop:/opt/ros/overlay_ws/src/workshop`               | put your code in `./src/workshop` |
 | `source ./install/setup.bash`                                          | automatic in `pixi shell`/tasks |
-| `colcon build`                                                         | `pixi run build` (or `colcon build` inside `pixi shell`) |
+| `colcon build`                                                         | `pixi run build` for ros2_control, or `colcon build` inside `pixi shell` for your own packages |
 | `ros2 launch turtlebot4_gz_bringup turtlebot4_gz.launch.py world:=maze`| `pixi run sim`                  |
 | teleop keyboard command                                                | `pixi run teleop`               |
 | velocity publisher command                                             | `pixi run drive-circle`         |
@@ -79,7 +93,7 @@ Create your package under `src/workshop/` (or clone the finished example):
 cd src/workshop
 git clone https://github.com/kscottz/tb4_toy.git
 cd ../..
-pixi run build
+colcon build --merge-install --packages-select tb4_toy
 pixi shell
 ros2 run tb4_toy toy_node
 ros2 service call /do_loopy std_srvs/Trigger '{}'
@@ -100,7 +114,7 @@ permissions section of the original README does not apply here.
   RoboStack doesn't ship) into `./src`; their remaining binary dependencies
   (nav2, slam_toolbox, robot_localization, xacro, ...) are declared in
   `pixi.toml`.
-- `colcon build --symlink-install` → `pixi run build`.
+- `colcon build --symlink-install` → `pixi run build` (ros2_control up to `controller_manager`).
 - entrypoint sourcing of the overlay → pixi activation scripts
   (`scripts/activate.sh` / `scripts/activate.bat`).
 

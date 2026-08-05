@@ -43,11 +43,15 @@ ros-jazzy-joint-state-publisher = "*"
 ros-jazzy-joint-state-publisher-gui = "*"
 
 # --- ros2_control stack: irobot_create_control drives the wheels through a
-#     diff-drive controller loaded by the gz_ros2_control Gazebo plugin
-ros-jazzy-ros2-control = "*"        # controller_manager & friends
+#     diff-drive controller loaded by the gz_ros2_control Gazebo plugin.
+#     NOTE: we intentionally do NOT install the ros2_control metapackage from
+#     conda. We build ros2_control from source (see `pixi run setup`) with the
+#     controller_manager publisher thread disabled, because that thread
+#     segfaults the Gazebo server on Windows when a robot is spawned.
 ros-jazzy-ros2-controllers = "*"    # diff_drive_controller, joint_state_broadcaster
 ros-jazzy-gz-ros2-control = "*"     # bridges ros2_control into Gazebo Harmonic
 ros-jazzy-rsl = "*"                 # exec dep of irobot_create_control
+ros-jazzy-pal-statistics = "*"      # dep of controller_manager (used as binary/link dep)
 
 # --- TurtleBot 4 + iRobot Create 3 simulator stack
 #     (previously cloned and built from source; now available as conda packages)
@@ -113,20 +117,63 @@ scripts = ["scripts/activate.bat"]
 # 1. Fetch the simulator sources (idempotent). Equivalent to the Dockerfile's
 #    `git clone https://github.com/turtlebot/turtlebot4_simulator -b jazzy`
 #    plus the repos rosdep would otherwise install as debs but which RoboStack
-#    doesn't package (turtlebot4, create3_sim, irobot_create_msgs).
-setup = { cmd = "python scripts/setup_workspace.py", description = "Clone TurtleBot 4 simulator sources into ./src" }
+#    doesn't package, plus ros2_control (source-built only so controller_manager
+#    can be patched to not start the Windows-crashing publisher thread).
+setup = { cmd = "python scripts/setup_workspace.py", description = "Clone TurtleBot 4 + ros2_control sources (with Windows patches) into ./src" }
 
 # 2. Check for any system deps we haven't covered (optional, informational)
 deps-check = { cmd = "rosdep check --from-paths src --ignore-src", description = "Report any missing dependencies" }
 
-# 3. Build the overlay workspace. Equivalent to the Dockerfile's
-#    `colcon build --symlink-install`. We use --merge-install so the overlay
-#    layout (and activation script) is identical on all three OSes, and it
-#    keeps paths short enough for Windows.
-build = { cmd = "colcon build --merge-install --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release", depends-on = ["setup"], description = "colcon build the workspace" }
+# 3. Build only ros2_control from source (up to controller_manager) so the
+#    patched controller_manager is used without rebuilding the full workspace.
+#    We use --merge-install so the overlay layout (and activation script) is
+#    identical on all three OSes, and it keeps paths short enough for Windows.
+#    BUILD_TESTING=OFF skips gtest targets (not needed here).
+#    NOTE: --symlink-install is intentionally omitted. On Windows it requires
+#    the "Create symbolic links" privilege (SeCreateSymbolicLinkPrivilege),
+#    which normal accounts lack, causing "A required privilege is not held by
+#    the client" during ament_cmake_python. To use --symlink-install anyway,
+#    enable Developer Mode (Settings > System > For developers) or run from an
+#    admin shell, then add the flag back.
+#    CMAKE_CXX_STANDARD=20 is required because ros2_control_node.cpp uses C++20
+#    designated initializers; MSVC defaults to an older standard and rejects
+#    them ("error C7555 ... requires at least '/std:c++20'").
+build = { cmd = "colcon build --merge-install --packages-up-to controller_manager --packages-ignore ros2_control_test_assets hardware_interface_testing --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_CXX_STANDARD=20", depends-on = ["setup"], description = "Build ros2_control from source (up to controller_manager)" }
+
+# 3b. Rebuild only the ros2_control stack needed by controller_manager.
+#     Faster iteration than a full workspace build.
+build-ros2-control = { cmd = "colcon build --merge-install --packages-up-to controller_manager --packages-ignore ros2_control_test_assets hardware_interface_testing --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_CXX_STANDARD=20", depends-on = ["setup"], description = "Rebuild source ros2_control stack (up to controller_manager)" }
 
 [target.win-64.tasks]
-sim-server = { cmd = "gz sim .pixi/envs/default/Library/share/turtlebot4_gz_bringup/worlds/maze.sdf -s -r -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", description = "Launch Gazebo server only (Windows)" }
+# One-shot for Windows: build the patched controller_manager, then stamp its
+# DLL over the conda copy so the loader actually uses it. Use this instead of
+# `build-ros2-control` on Windows.
+build-fix = { depends-on = ["build-ros2-control", "overlay-controller-manager"], description = "Build patched ros2_control stack and overlay controller_manager.dll (Windows)" }
+# Clock bridge — relays Gazebo's /clock onto the ROS /clock topic. On Linux the
+# combined sim.launch.py starts this automatically, but the Windows server/GUI
+# split bypasses that launch file, so nothing publishes /clock and every node
+# with use_sim_time:=true (controller_manager, create3 nodes, the dock service)
+# stalls waiting for time. This runs the exact bridge sim.launch.py would.
+# The '[' means one-way gz -> ROS, matching upstream. Run it as its own
+# terminal alongside sim-server / sim-gui / sim-robot.
+clock-bridge = { cmd = "ros2 run ros_gz_bridge parameter_bridge /clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock", description = "Relay Gazebo /clock to ROS (needed on the Windows split-launch path)" }
+# After building the patched controller_manager, copy its DLL over the conda
+# copy. This is necessary because gz_ros2_control-system.dll lives in the conda
+# Library\bin and resolves its controller_manager.dll import from that same
+# directory, which beats the install\ overlay on PATH. Overwriting the conda
+# copy is the only reliable way to make the loader pick up the patched DLL.
+# Backs up the original once. A `pixi install`/re-solve restores the conda DLL,
+# so re-run this (or `build` -> `overlay-controller-manager`) after that.
+overlay-controller-manager = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/overlay_controller_manager.ps1", description = "Place patched controller_manager.dll where gz_ros2_control resolves it (Windows)" }
+# Stamp the patched controller_manager.dll over the conda copy right before the
+# sim starts. This is the no-backup companion to overlay-controller-manager:
+# gz_ros2_control resolves controller_manager.dll from the conda Library\bin
+# (which beats the install\ overlay on PATH), so the patched DLL must physically
+# replace the conda one. Runs on every sim-server start so a re-solve can't
+# leave the unpatched DLL in place. Only copies if the build produced the DLL,
+# and ignores a locked-file failure (e.g. a sim already running).
+overlay-cm-nobackup = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/overlay_controller_manager.ps1 -NoBackup", description = "Stamp patched controller_manager.dll over conda copy, no backup (Windows)" }
+sim-server = { cmd = "gz sim .pixi/envs/default/Library/share/turtlebot4_gz_bringup/worlds/maze.sdf -s -r -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", depends-on = ["overlay-cm-nobackup"], description = "Launch Gazebo server only (Windows; overlays patched controller_manager.dll first)" }
 sim-robot = { cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_spawn.launch.py world:=maze model:=standard", description = "Spawn TurtleBot 4 and ROS bridge/node stack (Windows)" }
 sim-gui = { cmd = "gz sim -g -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", description = "Launch Gazebo GUI and connect to running server (Windows)" }
 stop-sim = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/stop_ros_windows.ps1", description = "Stop lingering ROS/Gazebo process trees (Windows)" }
