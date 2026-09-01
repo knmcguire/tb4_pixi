@@ -90,11 +90,13 @@ also works out of the box inside `pixi shell`.
 Create your package under `src/workshop/` (or clone the finished example):
 
 ```bash
+# In your pixi directory e.g. ~/code/tb4_pixi
+mkdir -p ./src/workshop
 cd src/workshop
 git clone https://github.com/kscottz/tb4_toy.git
 cd ../..
 colcon build --merge-install --packages-select tb4_toy
-pixi shell
+pixi shell  # Source the ROS workspace
 ros2 run tb4_toy toy_node
 ros2 service call /do_loopy std_srvs/Trigger '{}'
 ```
