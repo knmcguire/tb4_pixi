@@ -131,4 +131,4 @@ This kills known TurtleBot 4 simulator process trees started by this workspace.
 
 ## Disclaimer
 
-This repo has been generated with assistence of Github Copilot Pro
+This repo has been generated with assistence of Github Copilot Pro and Claude Pro using various models.
