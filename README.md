@@ -44,7 +44,7 @@ pixi install
 pixi run sim       
 ```
 
-## WSL on Windows 11 (Ubuntu 24.04)
+### WSL on Windows 11 (Ubuntu 24.04)
 
 First in powershell make a new WSL instance:
 
@@ -106,7 +106,7 @@ ros2 run tb4_toy toy_node
 ros2 service call /do_loopy std_srvs/Trigger '{}'
 ```
 
-### Support
+## Support
 
 Make sure to file a ticket (aka making an issue here) if you need any help! Make sure to give us the following information:
 
