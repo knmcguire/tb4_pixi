@@ -1,4 +1,4 @@
-# ROSCon 2025 Intro to ROS Workshop — pixi edition
+# ROSCon 2026 Intro to ROS Workshop — pixi edition
 #
 # Cross-platform (Linux / macOS / Windows) replacement for
 # https://github.com/kscottz/turtlebot4_docker
@@ -17,7 +17,7 @@
 # --volume ... /src/workshop          ->  your code just lives in ./src/workshop natively
 
 [workspace]
-name = "roscon2025-intro-workshop"
+name = "roscon2026-intro-workshop"
 version = "1.0.0"
 description = "ROS 2 Jazzy + Gazebo Harmonic + TurtleBot 4 simulation, no Docker required"
 authors = ["ROSCon 2025 Workshop"]

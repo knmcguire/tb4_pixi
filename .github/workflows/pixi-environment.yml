@@ -1,0 +1,22 @@
+name: Pixi Environment
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    name: Install Pixi environment
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Pixi
+        uses: prefix-dev/setup-pixi@v0.10.2
+
+      - name: Install environment
+        run: pixi install
