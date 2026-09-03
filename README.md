@@ -1,52 +1,80 @@
-# ROSCon 2025 Intro to ROS Workshop — pixi edition
+# ROSCon 2025 Intro to ROS Workshop - pixi edition
 
 > [!WARNING] 
 > 
-> -- EXPERIMENTAL!!! still ongoing bugs that need to be fixed --
+> -- There are still reported bugs so make sure to report any issues you encounter as a ticket here as "issues" --
 
-A cross-platform (Linux, macOS, Windows) replacement for the
-[turtlebot4_docker](https://github.com/kscottz/turtlebot4_docker) container.
-Instead of Docker + rocker + X11 forwarding, everything — ROS 2 Jazzy, Gazebo
-Harmonic, and the TurtleBot 4 simulation — is installed into a local,
-self-contained [pixi](https://pixi.sh) environment using the
-[RoboStack](https://robostack.github.io) conda packages. Gazebo's GUI runs
-natively on your desktop, no `--x11` tricks required, and your files are just
-your files (no `chown -R` after the workshop).
+A cross-platform (Linux, Windows) replacement for the[turtlebot4_docker](https://github.com/kscottz/turtlebot4_docker) container.
+Instead of Docker + rocker + X11 forwarding, everything (ROS 2 Jazzy, Gazebo Harmonic, and the TurtleBot 4 simulation) is installed into a local, self-contained [pixi](https://pixi.sh) environment using the[RoboStack](https://robostack.github.io) conda packages. Gazebo's GUI runs natively on your desktop.
 
 ## Prerequisites
 
-1. Install pixi: `curl -fsSL https://pixi.sh/install.sh | sh`
-   (Windows PowerShell: `powershell -c "irm https://pixi.sh/install.ps1 | iex"`)
-2. **Windows only:** install Visual Studio 2022 (Community is fine) or the
+
+You should have these operating system on your laptop. This is ranked from preferred to risky.
+
+* Preferred (this will definitely work):
+  * Ubuntu 24.04 Native install
+* Less preferred (will most likely work): 
+  * Ubuntu 26.04 Native install
+  * WSL with Ubuntu 24.04 on Windows 11
+* Little risky (will need some attention and potentially additional help):
+  * Windows 11
+* Risky (if you are brave and AI credits to spare):
+  * MacOS (but mind that we will not be able to help out much here)
+
+Let us know in the issues here if you are having issues with your system
+
+Pre-install instructions:
+
+1. Install pixi: https://pixi.prefix.dev/latest/installation/ 
+2. Install Visual Studio Code: https://code.visualstudio.com/ (if you are using WSL make sure to install the Remote development extension)
+3. **Windows only:** install Visual Studio 2022 (Community is fine) or the
    Build Tools, with the *Desktop development with C++* workload. It's needed
    to compile the TurtleBot 4 packages.
 
 ## Installation
 
-### Ubuntu
+### Ubuntu 24.04 (or 26.04)
 
 ```bash
-git clone <this repo>
-cd <this repo>
+git clone https://github.com/knmcguire/tb4_pixi
+cd https://github.com/knmcguire/tb4_pixi
 
 pixi install      
 pixi run sim       
 ```
 
-### Windows
+## WSL on Windows 11 (Ubuntu 24.04)
 
+First in powershell make a new WSL instance:
+
+```powershell
+wsl --install -d Ubuntu-26.04 --name wsl-u2404-rosconworkshop 
+```
+
+Then open up the new wsl by powershell: 
+
+```powershell
+wsl -d wsl-u2404-rosconworkshop
+```
+
+You can also find 'wsl-u2404-rosconworkshop' as app, or open op a 'wsl-u2404-rosconworkshop' tab in the windows terminal.
+
+once WSL is installed and opened, you can install pixi and follow the Ubuntu installation instructions
+
+### Windows 11 (Use with caution)
+
+Mind that Windows 11 native install of pixi of the workshop does not work super ideal yet, but if WSL2 does not work out for you than that is a path that is also avaible. It just has different instructions. 
 
 ```cmd
-git clone <this repo>
-cd <this repo>
+git clone https://github.com/knmcguire/tb4_pixi
+cd https://github.com/knmcguire/tb4_pixi
 
 pixi run setup
 pixi run build-fix
-      
 ```
 
-
-On Windows, you can run Gazebo server, robot stack, and GUI in separate terminals:
+On Windows, you need to run Gazebo server, robot stack, and GUI in separate terminals:
 
 ```powershell
 # Terminal 1
@@ -62,86 +90,34 @@ pixi run sim-gui
 pixi run clock-bridge
 ```
 
+## Test out workshop code
 
-## Workshop workflow (Docker → pixi cheat sheet)
-
-| Docker workshop                                                        | pixi edition                    |
-| ---------------------------------------------------------------------- | ------------------------------- |
-| `docker pull ...` / `docker build . -t tb4`                            | `pixi run build` (ros2_control source build) |
-| `rocker --x11 --devices=/dev/dri tb4 bash`                             | `pixi shell`                    |
-| `--volume .../workshop:/opt/ros/overlay_ws/src/workshop`               | put your code in `./src/workshop` |
-| `source ./install/setup.bash`                                          | automatic in `pixi shell`/tasks |
-| `colcon build`                                                         | `pixi run build` for ros2_control, or `colcon build` inside `pixi shell` for your own packages |
-| `ros2 launch turtlebot4_gz_bringup turtlebot4_gz.launch.py world:=maze`| `pixi run sim`                  |
-| teleop keyboard command                                                | `pixi run teleop`               |
-| velocity publisher command                                             | `pixi run drive-circle`         |
-| `sudo chown -R $(whoami) ./workshop/`                                  | not needed 🎉                   |
-
-Open extra terminals the same way you'd `docker exec` into the container:
-just run `pixi shell` in the project directory again. Every shell has ROS 2,
-Gazebo, and your built overlay sourced and ready (`ros2 topic list`,
-`ros2 run tb4_toy toy_node`, etc.).
-
-Working through the [ROS 2 Jazzy CLI tutorials](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools.html)
-also works out of the box inside `pixi shell`.
-
-## Writing your workshop code
-
-Create your package under `src/workshop/` (or clone the finished example):
+Please follow the instructions in the presentation, but if you just want to test out the workshop code that is possible with the finished example:
 
 ```bash
 # In your pixi directory e.g. ~/code/tb4_pixi
-mkdir -p ./src/workshop
-cd src/workshop
+mkdir -p src/
+cd src/
 git clone https://github.com/kscottz/tb4_toy.git
 cd ../..
-colcon build --merge-install --packages-select tb4_toy
 pixi shell  # Source the ROS workspace
+colcon build --merge-install --packages-select tb4_toy
 ros2 run tb4_toy toy_node
 ros2 service call /do_loopy std_srvs/Trigger '{}'
 ```
 
-Files are created as your own user on your own filesystem — the Docker
-permissions section of the original README does not apply here.
+### Support
 
-## How it maps to the Dockerfile
+Make sure to file a ticket (aka making an issue here) if you need any help! Make sure to give us the following information:
 
-- `FROM ros:jazzy` + `ros-jazzy-desktop` → `ros-jazzy-desktop` from the
-  `robostack-jazzy` channel.
-- `apt install gz-harmonic` + `ros-jazzy-ros-gz` → `ros-jazzy-ros-gz`, which
-  pulls Gazebo Harmonic (gz-sim 8) from conda-forge on all three OSes.
-- `git clone turtlebot4_simulator -b jazzy` + `rosdep install` →
-  `pixi run setup` clones `turtlebot4_simulator`, `turtlebot4`, `create3_sim`
-  and `irobot_create_msgs` (the packages rosdep would install as debs but that
-  RoboStack doesn't ship) into `./src`; their remaining binary dependencies
-  (nav2, slam_toolbox, robot_localization, xacro, ...) are declared in
-  `pixi.toml`.
-- `colcon build --symlink-install` → `pixi run build` (ros2_control up to `controller_manager`).
-- entrypoint sourcing of the overlay → pixi activation scripts
-  (`scripts/activate.sh` / `scripts/activate.bat`).
+* The operating system
+* The error from the terminal
+* The generated pixi.lock file 
+* The ROS log files with the errors
 
-If a build complains about a missing dependency, run
-`pixi run deps-check` to see what rosdep thinks is missing, then
-`pixi add ros-jazzy-<name>` (RoboStack naming: underscores become dashes).
+### Troubles shooting
 
-## Platform notes
-
-- **Linux** is the best-supported platform, same as upstream ROS. If Gazebo's
-  GUI or the simulated lidar misbehaves on machines without a discrete GPU,
-  uncomment the software-rendering exports at the bottom of
-  `scripts/activate.sh` (this mirrors the "no fancy graphics card" tuning the
-  Docker container does).
-- **macOS** (Intel and Apple Silicon) runs natively — no X11/XQuartz. Gazebo
-  GUI support on macOS is newer and some rendering-based sensors have had
-  Metal-related quirks; if the full sim is unstable, you can still do all the
-  ROS 2 CLI/tutorial parts, run the sim headless (`world:=maze` with
-  `gui:=false`-style args), or use RViz2.
-- **Windows** runs natively too (no WSL required), but it is the least-tested
-  combination for Gazebo. Keep the project in a short path (e.g. `C:\ws`) to
-  avoid Windows path-length limits during the colcon build. If native Windows
-  gives you trouble, WSL2 + the Linux instructions is a reliable fallback.
-
-### Windows process cleanup
+#### Windows improper cleanup
 
 On some Windows setups, `Ctrl+C` does not fully tear down all child processes
 spawned by `ros2 launch` / Gazebo, leaving background `gz`/ROS processes alive.
@@ -153,13 +129,6 @@ pixi run stop-sim
 
 This kills known TurtleBot 4 simulator process trees started by this workspace.
 
+## Disclaimer
 
-## Layout
-
-```
-pixi.toml                    # environment + tasks (the "Dockerfile")
-scripts/setup_workspace.py   # clones simulator sources into ./src
-scripts/clean_workspace.py   # removes build/ install/ log/
-scripts/activate.sh|.bat     # auto-source the colcon overlay
-src/                         # simulator sources + your workshop code
-```
+This repo has been generated with assistence of Github Copilot Pro
