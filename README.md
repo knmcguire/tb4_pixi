@@ -64,30 +64,14 @@ once WSL is installed and opened, you can install pixi and follow the Ubuntu ins
 
 ### Windows 11 (Use with caution)
 
-Mind that Windows 11 native install of pixi of the workshop does not work super ideal yet, but if WSL2 does not work out for you than that is a path that is also avaible. It just has different instructions. 
+Windows native install should work with this pixi install but use with caution! If it doesn't work the first time, just ctrl-c and try again. Otherwise, use the WSL version.
 
-```cmd
+```bash
 git clone https://github.com/knmcguire/tb4_pixi
 cd https://github.com/knmcguire/tb4_pixi
 
-pixi run setup
-pixi run build-fix
-```
-
-On Windows, you need to run Gazebo server, robot stack, and GUI in separate terminals:
-
-```powershell
-# Terminal 1
-pixi run sim-server
-
-# Terminal 2
-pixi run sim-robot
-
-# Terminal 3
-pixi run sim-gui
-
-# Terminal 4 (/clock bridge)
-pixi run clock-bridge
+pixi install      
+pixi run sim       
 ```
 
 ## Test out workshop code
