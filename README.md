@@ -1,4 +1,4 @@
-# ROSCon 2025 Intro to ROS Workshop - pixi edition
+# ROSCon 2026 Intro to ROS Workshop - pixi edition
 
 > [!WARNING] 
 > 
