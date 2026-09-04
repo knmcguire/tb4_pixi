@@ -184,6 +184,10 @@ stop-sim = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/stop_ros_wi
 cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_gz.launch.py world:=maze"
 description = "Launch the TurtleBot 4 maze simulation"
 
+[target.win-64.tasks.sim]
+cmd = "ros2 launch sim.launch.xml"
+description = "Launch the TurtleBot 4 maze simulation with the Windows split launcher"
+
 [tasks.teleop]
 cmd = "ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=cmd_vel_unstamped"
 description = "Drive the robot with the keyboard"
