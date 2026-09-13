@@ -95,7 +95,7 @@ scripts = ["scripts/activate.bat"]
 [tasks]
 
 [target.win-64.tasks]
-clock-bridge = { cmd = "ros2 run ros_gz_bridge parameter_bridge /clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock", description = "Relay Gazebo /clock to ROS (needed on the Windows split-launch path)" }
+clock-bridge = { cmd = "ros2 run ros_gz_bridge parameter_bridge \"/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock\"", description = "Relay Gazebo /clock to ROS (needed on the Windows split-launch path)" }
 sim-server = { cmd = "gz sim .pixi/envs/default/Library/share/turtlebot4_gz_bringup/worlds/maze.sdf -s -r -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", description = "Launch Gazebo server only (Windows; overlays patched controller_manager.dll first)" }
 sim-robot = { cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_spawn.launch.py world:=maze model:=standard", description = "Spawn TurtleBot 4 and ROS bridge/node stack (Windows)" }
 sim-gui = { cmd = "gz sim -g -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", description = "Launch Gazebo GUI and connect to running server (Windows)" }
@@ -110,6 +110,14 @@ description = "Launch the TurtleBot 4 maze simulation"
 [target.win-64.tasks.sim]
 cmd = "ros2 launch sim.launch.xml"
 description = "Launch the TurtleBot 4 maze simulation with the Windows split launcher"
+
+[target.osx-64.tasks.sim]
+cmd = "ros2 launch sim.launch.xml"
+description = "Launch the TurtleBot 4 maze simulation with the Mac split launcher"
+
+[target.osx-arm64.tasks.sim]
+cmd = "ros2 launch sim.launch.xml"
+description = "Launch the TurtleBot 4 maze simulation with the Mac split launcher"
 
 [tasks.teleop]
 cmd = "ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=cmd_vel_unstamped"
