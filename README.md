@@ -62,7 +62,7 @@ You can also find 'wsl-u2404-rosconworkshop' as app, or open op a 'wsl-u2404-ros
 
 once WSL is installed and opened, you can install pixi and follow the Ubuntu installation instructions
 
-### Windows 11 (Use with caution)
+### Windows 11 Natively(Use with caution)
 
 Windows native install should work with this pixi install but use with caution! If it doesn't work the first time, just ctrl-c and try again. Otherwise, use the WSL version.
 
@@ -72,6 +72,22 @@ cd https://github.com/knmcguire/tb4_pixi
 
 pixi install      
 pixi run sim       
+```
+
+
+## Test basic functionality
+
+Ofcourse we'd like to know if everything is working correctly.
+If you see the following image with all the right gazebo plugins and without major error, you should be in!
+
+![gazebo sim](sim.png)
+
+In the Turtlebot HMI in the Gazebo GUI, select undock and press run.
+If you see the Turtlebot in simulation move a bit forward and this in the terminal, then you are golden and ready for the workshop!
+
+```bash
+[pixi-3] [motion_control.EXE-33] [INFO] [1789328333.784803400] [motion_control]: Received new undock goal
+[pixi-3] [turtlebot4_node.EXE-28] [INFO] [1789328333.785208900] [turtlebot4_node]: undock goal accepted by server, waiting for result
 ```
 
 ## Test out workshop code
@@ -99,7 +115,7 @@ Make sure to file a ticket (aka making an issue here) if you need any help! Make
 * The generated pixi.lock file 
 * The ROS log files with the errors
 
-### Troubles shooting
+### Trouble shooting
 
 #### Windows improper cleanup
 
