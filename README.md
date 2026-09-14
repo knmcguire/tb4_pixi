@@ -4,7 +4,7 @@
 > 
 > -- There are still reported bugs so make sure to report any issues you encounter as a ticket here as "issues" --
 
-A cross-platform (Linux, Windows) replacement for the[turtlebot4_docker](https://github.com/kscottz/turtlebot4_docker) container.
+A cross-platform (Linux, macOS, Windows) replacement for the[turtlebot4_docker](https://github.com/kscottz/turtlebot4_docker) container.
 Instead of Docker + rocker + X11 forwarding, everything (ROS 2 Jazzy, Gazebo Harmonic, and the TurtleBot 4 simulation) is installed into a local, self-contained [pixi](https://pixi.sh) environment using the[RoboStack](https://robostack.github.io) conda packages. Gazebo's GUI runs natively on your desktop.
 
 ## Prerequisites
@@ -74,6 +74,32 @@ pixi install
 pixi run sim       
 ```
 
+### macOS
+
+From the cloned repository, run:
+
+```bash
+pixi install
+pixi run sim
+```
+
+The split starter launches the Gazebo server, clock bridge, robot, and GUI as separate processes.
+It uses Ogre 2 with Metal for both server sensors and the GUI, overriding the robot description's Ogre 1 renderer.
+Pixi also sets `FASTDDS_BUILTIN_TRANSPORTS=UDPv4` on macOS to avoid shared-memory lock failures.
+These settings apply automatically, including when you run ROS commands from another terminal with `pixi run`.
+
+Linux keeps the upstream ROS launcher.
+Windows uses the same split starter as macOS, with its own resource paths and without the Metal flags.
+
+To check that simulated lidar data reaches ROS, run this in another terminal:
+
+```bash
+pixi run ros2 topic echo /scan --once --field header
+```
+
+Stop the simulation with `Ctrl+C` in the launch terminal.
+If nodes remain alive, run `pixi run stop-sim` from another terminal.
+
 
 ## Test basic functionality
 
@@ -117,17 +143,24 @@ Make sure to file a ticket (aka making an issue here) if you need any help! Make
 
 ### Trouble shooting
 
-#### Windows improper cleanup
+#### Stop leftover simulation processes
 
-On some Windows setups, `Ctrl+C` does not fully tear down all child processes
-spawned by `ros2 launch` / Gazebo, leaving background `gz`/ROS processes alive.
-If that happens, run:
+If `Ctrl+C` leaves ROS/Gazebo processes alive, or the robot stops spawning after a restart, run:
 
-```powershell
+```bash
 pixi run stop-sim
 ```
 
-This kills known TurtleBot 4 simulator process trees started by this workspace.
+This stops known simulator processes from this workspace, including orphaned nodes and any running simulation.
+On macOS and Linux, it only targets processes owned by your user in the active Pixi environment or workspace overlay, plus their descendants.
+It sends `SIGINT`, waits up to five seconds, then sends `SIGKILL` to survivors.
+The existing Windows cleanup command force-stops matching process trees.
+
+On macOS and Linux, preview the targets without stopping anything:
+
+```bash
+pixi run stop-sim --dry-run
+```
 
 ## Disclaimer
 
