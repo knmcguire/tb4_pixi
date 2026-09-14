@@ -86,6 +86,10 @@ GZ_VERSION = "harmonic"
 [target.unix.activation]
 scripts = ["scripts/activate.sh"]
 
+[target.osx.activation.env]
+# Avoid Fast DDS shared-memory lock failures on macOS, including ROS CLI tasks.
+FASTDDS_BUILTIN_TRANSPORTS = "UDPv4"
+
 [target.win-64.activation]
 scripts = ["scripts/activate.bat"]
 
@@ -93,31 +97,28 @@ scripts = ["scripts/activate.bat"]
 # Tasks 
 # ---------------------------------------------------------------------------
 [tasks]
-
-[target.win-64.tasks]
-clock-bridge = { cmd = "ros2 run ros_gz_bridge parameter_bridge \"/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock\"", description = "Relay Gazebo /clock to ROS (needed on the Windows split-launch path)" }
-sim-server = { cmd = "gz sim .pixi/envs/default/Library/share/turtlebot4_gz_bringup/worlds/maze.sdf -s -r -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", description = "Launch Gazebo server only (Windows; overlays patched controller_manager.dll first)" }
-sim-robot = { cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_spawn.launch.py world:=maze model:=standard", description = "Spawn TurtleBot 4 and ROS bridge/node stack (Windows)" }
-sim-gui = { cmd = "gz sim -g -v 4 --gui-config .pixi/envs/default/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config", description = "Launch Gazebo GUI and connect to running server (Windows)" }
-stop-sim = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/stop_ros_windows.ps1", description = "Stop lingering ROS/Gazebo process trees (Windows)" }
+clock-bridge = { cmd = "ros2 run ros_gz_bridge parameter_bridge \"/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock\"", description = "Relay Gazebo /clock to ROS for the split launcher" }
+sim-robot = { cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_spawn.launch.py world:=maze model:=standard", description = "Spawn TurtleBot 4 and its ROS bridge/node stack" }
 
 [tasks.sim]
-# The workshop's headline command:
-#   ros2 launch turtlebot4_gz_bringup turtlebot4_gz.launch.py world:=maze
+# Linux uses the upstream launcher; macOS and Windows start server and GUI separately.
 cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_gz.launch.py world:=maze"
 description = "Launch the TurtleBot 4 maze simulation"
 
-[target.win-64.tasks.sim]
-cmd = "ros2 launch sim.launch.xml"
-description = "Launch the TurtleBot 4 maze simulation with the Windows split launcher"
+[target.unix.tasks]
+stop-sim = { cmd = "python scripts/stop_ros_unix.py", description = "Stop this workspace's ROS/Gazebo processes, including orphaned nodes" }
 
-[target.osx-64.tasks.sim]
-cmd = "ros2 launch sim.launch.xml"
-description = "Launch the TurtleBot 4 maze simulation with the Mac split launcher"
+[target.win-64.tasks]
+sim = { cmd = "ros2 launch sim.launch.xml", description = "Launch the TurtleBot 4 maze simulation with the Windows split launcher" }
+sim-server = { cmd = 'gz sim "$CONDA_PREFIX/Library/share/turtlebot4_gz_bringup/worlds/maze.sdf" -s -r -v 4 --gui-config "$CONDA_PREFIX/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config"', description = "Launch the Gazebo server on Windows" }
+sim-gui = { cmd = 'gz sim -g -v 4 --gui-config "$CONDA_PREFIX/Library/share/turtlebot4_gz_bringup/gui/standard/gui.config"', description = "Connect the Gazebo GUI to the running server on Windows" }
+stop-sim = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/stop_ros_windows.ps1", description = "Stop lingering ROS/Gazebo process trees on Windows" }
 
-[target.osx-arm64.tasks.sim]
-cmd = "ros2 launch sim.launch.xml"
-description = "Launch the TurtleBot 4 maze simulation with the Mac split launcher"
+[target.osx.tasks]
+sim = { cmd = "ros2 launch sim.launch.xml", description = "Launch the TurtleBot 4 maze simulation with the macOS split launcher" }
+# Use Ogre 2 with Metal for both server sensors and the GUI on macOS
+sim-server = { cmd = 'gz sim "$CONDA_PREFIX/share/turtlebot4_gz_bringup/worlds/maze.sdf" -s -r -v 4 --render-engine-server ogre2 --render-engine-server-api-backend metal', description = "Launch the Gazebo server with Ogre 2 / Metal on macOS" }
+sim-gui = { cmd = 'gz sim -g -v 4 --gui-config "$CONDA_PREFIX/share/turtlebot4_gz_bringup/gui/standard/gui.config" --render-engine-gui ogre2 --render-engine-gui-api-backend metal', description = "Connect the Gazebo GUI using Ogre 2 / Metal on macOS" }
 
 [tasks.teleop]
 cmd = "ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=cmd_vel_unstamped"
