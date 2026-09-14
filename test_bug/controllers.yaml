@@ -1,0 +1,9 @@
+# Smallest possible controller setup: just the state broadcaster.
+# This is enough for ControllerManager -> pal_statistics to initialize,
+# which is where the win-64 segfault occurs.
+controller_manager:
+  ros__parameters:
+    update_rate: 50  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
