@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <launch>
-  <executable cmd="pixi run sim-server" output="screen"/>
-
+  <executable cmd="pixi run sim-server" output="screen" name="sim-server"/>
+  
   <timer period="2.0">
-    <executable cmd="pixi run clock-bridge" output="screen"/>
+    <executable cmd="pixi run clock-bridge" output="screen" name="clock-bridge"/>
   </timer>
 
   <timer period="5.0">
-    <executable cmd="pixi run sim-robot" output="screen"/>
+    <executable cmd="pixi run sim-robot" output="screen" name="sim-robot"/>
   </timer>
 
   <timer period="10.0">
-    <executable cmd="pixi run sim-gui" output="screen"/>
+    <executable cmd="pixi run sim-gui" output="screen" name="sim-gui"/>
   </timer>
 </launch>
