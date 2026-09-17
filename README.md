@@ -84,7 +84,7 @@ pixi run sim
 
 ### macOS (experimental)
 
-MacOS native install should work with this pixi install but use with caution! If it doesn't work the first time, just ctrl-c and try again. Otherwise, use the WSL version.
+MacOS native install should work with this pixi install but use with caution! If it doesn't work the first time, just ctrl-c and try again. Submit an issue if you are still having problems!
 
 
 From the cloned repository, run:
@@ -157,6 +157,9 @@ On macOS and Linux, preview the targets without stopping anything:
 ```bash
 pixi run stop-sim --dry-run
 ```
+#### Loading world models forever
+
+It could be that gazebo is still downloading world models for a while. Usually it is normal to wait for a few minutes, but if this takes longer than 10 minutes, please check out your networking capabilities of your computer.
 
 ## Disclaimer
 
