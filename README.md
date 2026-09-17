@@ -60,7 +60,7 @@ wsl -d wsl-u2404-rosconworkshop
 
 You can also find 'wsl-u2404-rosconworkshop' as app, or open op a 'wsl-u2404-rosconworkshop' tab in the windows terminal.
 
-Once WSL is installed and opened, do the following commands.
+Once WSL is installed and opened, install Pixi (see "Prerequisites") and do the following commands:
 
 ```bash
 git clone https://github.com/knmcguire/tb4_pixi
