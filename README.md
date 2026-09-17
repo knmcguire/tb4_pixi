@@ -70,7 +70,7 @@ pixi install
 pixi run sim       
 ```
 
-### Windows 11 Natively(Use with caution)
+### Windows 11 Natively (experimental)
 
 Windows native install should work with this pixi install but use with caution! If it doesn't work the first time, just ctrl-c and try again. Otherwise, use the WSL version.
 
@@ -82,32 +82,20 @@ pixi install
 pixi run sim       
 ```
 
-### macOS
+### macOS (experimental)
+
+MacOS native install should work with this pixi install but use with caution! If it doesn't work the first time, just ctrl-c and try again. Otherwise, use the WSL version.
+
 
 From the cloned repository, run:
 
 ```bash
+git clone https://github.com/knmcguire/tb4_pixi
+cd https://github.com/knmcguire/tb4_pixi
+
 pixi install
 pixi run sim
 ```
-
-The split starter launches the Gazebo server, clock bridge, robot, and GUI as separate processes.
-It uses Ogre 2 with Metal for both server sensors and the GUI, overriding the robot description's Ogre 1 renderer.
-Pixi also sets `FASTDDS_BUILTIN_TRANSPORTS=UDPv4` on macOS to avoid shared-memory lock failures.
-These settings apply automatically, including when you run ROS commands from another terminal with `pixi run`.
-
-Linux keeps the upstream ROS launcher.
-Windows uses the same split starter as macOS, with its own resource paths and without the Metal flags.
-
-To check that simulated lidar data reaches ROS, run this in another terminal:
-
-```bash
-pixi run ros2 topic echo /scan --once --field header
-```
-
-Stop the simulation with `Ctrl+C` in the launch terminal.
-If nodes remain alive, run `pixi run stop-sim` from another terminal.
-
 
 ## Test basic functionality
 
