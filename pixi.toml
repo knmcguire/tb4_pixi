@@ -100,6 +100,13 @@ scripts = ["scripts/activate.bat"]
 clock-bridge = { cmd = "ros2 run ros_gz_bridge parameter_bridge \"/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock\"", description = "Relay Gazebo /clock to ROS for the split launcher" }
 sim-robot = { cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_spawn.launch.py world:=maze model:=standard", description = "Spawn TurtleBot 4 and its ROS bridge/node stack" }
 
+[target.osx-arm64.tasks]
+sim-server = { cmd = "gz sim .pixi/envs/default/share/turtlebot4_gz_bringup/worlds/maze.sdf -s -r -v 4", description = "Launch Gazebo server only (Mac)" }
+sim-robot = { cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_spawn.launch.py world:=maze model:=standard", description = "Spawn TurtleBot 4 and ROS bridge/node stack (Mac)" }
+sim-gui = { cmd = "gz sim -g -v 4 --gui-config .pixi/envs/default/share/turtlebot4_gz_bringup/gui/standard/gui.config", description = "Launch Gazebo GUI and connect to running server (Mac)" }
+clock-bridge = { cmd = "ros2 run ros_gz_bridge parameter_bridge /clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock", description = "Relay Gazebo /clock to ROS (needed on the Mac split-launch path)" }
+
+
 [tasks.sim]
 # Linux uses the upstream launcher; macOS and Windows start server and GUI separately.
 cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_gz.launch.py world:=maze"
