@@ -38,7 +38,7 @@ Pre-install instructions:
 
 ```bash
 git clone https://github.com/knmcguire/tb4_pixi
-cd https://github.com/knmcguire/tb4_pixi
+cd tb4_pixi
 
 pixi install      
 pixi run sim       
@@ -64,7 +64,7 @@ Once WSL is installed and opened, install Pixi (see "Prerequisites") and do the 
 
 ```bash
 git clone https://github.com/knmcguire/tb4_pixi
-cd https://github.com/knmcguire/tb4_pixi
+cd tb4_pixi
 
 pixi install      
 pixi run sim       
@@ -76,7 +76,7 @@ Windows native install should work with this pixi install but use with caution! 
 
 ```bash
 git clone https://github.com/knmcguire/tb4_pixi
-cd https://github.com/knmcguire/tb4_pixi
+cd tb4_pixi
 
 pixi install      
 pixi run sim       
@@ -91,7 +91,7 @@ From the cloned repository, run:
 
 ```bash
 git clone https://github.com/knmcguire/tb4_pixi
-cd https://github.com/knmcguire/tb4_pixi
+cd tb4_pixi
 
 pixi install
 pixi run sim
