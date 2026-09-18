@@ -4,8 +4,8 @@
 > 
 > -- There are still reported bugs so make sure to report any issues you encounter as a ticket here as "issues" --
 
-A cross-platform (Linux, macOS, Windows) replacement for the[turtlebot4_docker](https://github.com/kscottz/turtlebot4_docker) container.
-Instead of Docker + rocker + X11 forwarding, everything (ROS 2 Jazzy, Gazebo Harmonic, and the TurtleBot 4 simulation) is installed into a local, self-contained [pixi](https://pixi.sh) environment using the[RoboStack](https://robostack.github.io) conda packages. Gazebo's GUI runs natively on your desktop.
+A cross-platform (Linux, macOS, Windows) replacement for the [turtlebot4_docker](https://github.com/kscottz/turtlebot4_docker) container.
+Instead of Docker + rocker + X11 forwarding, everything (ROS 2 Jazzy, Gazebo Harmonic, and the TurtleBot 4 simulation) is installed into a local, self-contained [pixi](https://pixi.sh) environment using the [RoboStack](https://robostack.github.io) conda packages. Gazebo's GUI runs natively on your desktop.
 
 ## Prerequisites
 
