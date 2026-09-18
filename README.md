@@ -139,7 +139,7 @@ Make sure to file a ticket (aka making an issue here) if you need any help! Make
 
 ### Trouble shooting
 
-#### Stop leftover simulation processes
+#### 1. Stop leftover simulation processes
 
 If `Ctrl+C` leaves ROS/Gazebo processes alive, or the robot stops spawning after a restart, run:
 
@@ -157,9 +157,18 @@ On macOS and Linux, preview the targets without stopping anything:
 ```bash
 pixi run stop-sim --dry-run
 ```
-#### Loading world models forever
+#### 2. Loading world models forever
 
-It could be that gazebo is still downloading world models for a while. Usually it is normal to wait for a few minutes, but if this takes longer than 10 minutes, please check out your networking capabilities of your computer.
+It could be that gazebo is still downloading world models for a while:
+
+```bash
+[create-8] [INFO] [xxxx.xxxx] [ros_gz_sim]: Requesting list of world names.
+[create-7] [INFO] [xxxx.xxxx] [ros_gz_sim]: Requesting list of world names.
+[create-8] [INFO] [xxxx.xxxx] [ros_gz_sim]: Requesting list of world names.
+....
+```
+
+Usually it is normal to wait for a few minutes, but if this takes longer than 10 minutes, please check out your networking capabilities of your computer.
 
 ## Disclaimer
 
