@@ -122,7 +122,7 @@ Please follow the instructions in the presentation, but if you just want to test
 mkdir -p src/
 cd src/
 git clone https://github.com/kscottz/tb4_toy.git
-cd ../..
+cd ..
 pixi shell  # Source the ROS workspace
 colcon build --merge-install --packages-select tb4_toy
 ros2 run tb4_toy toy_node
