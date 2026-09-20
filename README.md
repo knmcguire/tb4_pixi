@@ -115,7 +115,9 @@ If you see the Turtlebot in simulation move a bit forward and this in the termin
 
 ## Test out workshop code
 
-Please follow the instructions in the presentation, but if you just want to test out the workshop code that is possible with the finished example:
+Please follow the instructions in the presentation, but if you just want to test out the workshop code that is possible with the finished example.
+
+Make sure that the robot is undocked first! Check out "Test basic functionality"
 
 ```bash
 # In your pixi directory e.g. ~/code/tb4_pixi
@@ -123,11 +125,19 @@ mkdir -p src/
 cd src/
 git clone https://github.com/kscottz/tb4_toy.git
 cd ..
-pixi shell  # Source the ROS workspace
+pixi shell  
 colcon build --merge-install --packages-select tb4_toy
+source install/local_setup.bash #Source the ROS workspace, note that this will be different for windows
 ros2 run tb4_toy toy_node
-ros2 service call /do_loopy std_srvs/Trigger '{}'
 ```
+
+Then in a second terminal run
+
+```
+source install/local_setup.bash
+ros2 service call /do_loopy std_srvs/Trigger
+```
+
 
 ## Support
 
