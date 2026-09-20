@@ -49,7 +49,7 @@ pixi run sim
 First in powershell make a new WSL instance:
 
 ```powershell
-wsl --install -d Ubuntu-26.04 --name wsl-u2404-rosconworkshop 
+wsl --install -d Ubuntu-24.04 --name wsl-u2404-rosconworkshop 
 ```
 
 Then open up the new wsl by powershell: 
