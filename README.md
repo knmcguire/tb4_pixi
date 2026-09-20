@@ -56,6 +56,7 @@ Then open up the new wsl by powershell:
 
 ```powershell
 wsl -d wsl-u2404-rosconworkshop
+cd
 ```
 
 You can also find 'wsl-u2404-rosconworkshop' as app, or open op a 'wsl-u2404-rosconworkshop' tab in the windows terminal.
