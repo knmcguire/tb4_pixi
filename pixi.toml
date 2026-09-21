@@ -97,7 +97,7 @@ scripts = ["scripts/activate.bat"]
 # Tasks 
 # ---------------------------------------------------------------------------
 [tasks]
-clock-bridge = { cmd = "ros2 run ros_gz_bridge parameter_bridge \"/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock\"", description = "Relay Gazebo /clock to ROS for the split launcher" }
+clock-bridge = { cmd = "ros2 run ros_gz_bridge parameter_bridge \"/clock@rosgraph_msgs/msg/Clock@gz.msgs.Clock\"", description = "Relay Gazebo /clock to ROS for the split launcher" }
 sim-robot = { cmd = "ros2 launch turtlebot4_gz_bringup turtlebot4_spawn.launch.py world:=maze model:=standard", description = "Spawn TurtleBot 4 and its ROS bridge/node stack" }
 
 [tasks.sim]
