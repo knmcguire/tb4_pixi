@@ -178,8 +178,19 @@ It could be that gazebo is still downloading world models for a while:
 [create-8] [INFO] [xxxx.xxxx] [ros_gz_sim]: Requesting list of world names.
 ....
 ```
-
 Usually it is normal to wait for a few minutes, but if this takes longer than 10 minutes, please check out your networking capabilities of your computer.
+
+
+#### 3. Pixi shell on Windows has permission issues
+
+If you are having these issues on windows opening up pixi shell
+
+```
+ ... cannot be loaded because running scripts is disabled on this
+system. For more information  ...
+```
+
+This means that your PC is not enabled to run scripts from powershell. In that case, just use _Command Prompt_!
 
 ## Disclaimer
 
